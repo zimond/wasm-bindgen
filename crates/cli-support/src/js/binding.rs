@@ -722,9 +722,9 @@ fn instruction(js: &mut JsBuilder, instr: &Instruction, log_error: &mut bool) ->
                 "
                  // Instruction::I32Split64 
                  // Mask the low 32 bytes
-                 u32CvtShim[0] = Number({val} & 0xffffffffn);
+                 u32CvtShim[0] = Number({val} & BigInt('0xffffffffn'));
                  // Offset the high 32 bytes
-                 u32CvtShim[1] = Number({val} >> 32n);
+                 u32CvtShim[1] = Number(BitInt({val}) >> BitInt(32));
                  const low{i} = u32CvtShim[0];
                  const high{i} = u32CvtShim[1];
                  ",
@@ -748,7 +748,7 @@ fn instruction(js: &mut JsBuilder, instr: &Instruction, log_error: &mut bool) ->
                 "\
                     // Instruction::I32SplitOption64
                     u32CvtShim[0] = isLikeNone({val}) ? 0 : Number({val} & 0xffffffffn);
-                    u32CvtShim[1] = isLikeNone({val}) ? 0 : Number({val} >> 32n);
+                    u32CvtShim[1] = isLikeNone({val}) ? 0 : Number({val} >> BigInt(32));
                     const low{i} = u32CvtShim[0];
                     const high{i} = u32CvtShim[1];
                 ",
@@ -1014,8 +1014,8 @@ fn instruction(js: &mut JsBuilder, instr: &Instruction, log_error: &mut bool) ->
             let low = js.pop();
 
             let bigint = match *signed {
-                true => "BigInt.asIntN(64, (BigInt(u32CvtShim[1]) << 32n) | BigInt(u32CvtShim[0]))",
-                false => "(BigInt(u32CvtShim[1]) << 32n) | BigInt(u32CvtShim[0])"
+                true => "BigInt.asIntN(64, (BigInt(u32CvtShim[1]) << BigInt(32)) | BigInt(u32CvtShim[0]))",
+                false => "(BigInt(u32CvtShim[1]) << BigInt(32)) | BigInt(u32CvtShim[0])",
             };
 
             js.prelude(&format!(
@@ -1233,8 +1233,8 @@ fn instruction(js: &mut JsBuilder, instr: &Instruction, log_error: &mut bool) ->
             let present = js.pop();
 
             let bigint = match *signed {
-                true => "BigInt.asIntN(64, (BigInt(u32CvtShim[1]) << 32n) | BigInt(u32CvtShim[0]))",
-                false => "(BigInt(u32CvtShim[1]) << 32n) | BigInt(u32CvtShim[0])"
+                true => "BigInt.asIntN(64, (BigInt(u32CvtShim[1]) << BigInt(32)) | BigInt(u32CvtShim[0]))",
+                false => "(BigInt(u32CvtShim[1]) << BigInt(32)) | BigInt(u32CvtShim[0])",
             };
 
             js.prelude(&format!(
